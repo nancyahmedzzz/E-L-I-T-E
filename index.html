@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite | Luxury Fragrance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Background Particles Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-text">E L I T E</div>
+        <div class="preloader-line"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="#collection" class="nav-link hover-target">Collection</a>
+                <a href="#story" class="nav-link hover-target">Heritage</a>
+            </div>
+
+            <a href="#" class="logo hover-target">Elite</a>
+
+            <div class="nav-right">
+                <button class="nav-icon hover-target" id="theme-toggle">
+                    <svg id="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" style="display:none;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <button class="nav-icon hover-target" id="search-toggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+                <button class="nav-icon hover-target" id="wishlist-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                        </path>
+                    </svg>
+                    <span class="badge" id="wishlist-count">0</span>
+                </button>
+                <button class="nav-icon hover-target" id="cart-btn">
+                    <span class="cart-text">Cart</span>
+                    <span class="badge-dot" id="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+        <!-- Search Drawer -->
+        <div class="search-drawer" id="search-drawer">
+            <input type="text" id="live-search" placeholder="Type to explore fragrances..." class="hover-target">
+            <button class="close-search hover-target" id="close-search">&times;</button>
+        </div>
+    </nav>
+
+    <!-- Cart Drawer -->
+    <div class="overlay" id="overlay"></div>
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header">
+            <h2>Your Selection</h2>
+            <button class="close-btn hover-target" id="close-cart">Close</button>
+        </div>
+        <div class="cart-body" id="cart-items">
+            <!-- Items injected by JS -->
+        </div>
+        <div class="cart-footer">
+            <div class="total-row">
+                <span>Subtotal</span>
+                <span id="cart-total">$0</span>
+            </div>
+            <button class="btn-primary hover-target">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Full Screen Quick View Modal -->
+    <div class="fs-modal" id="fs-modal">
+        <button class="close-fs hover-target" id="close-modal">&times;</button>
+        <div class="fs-content">
+            <div class="fs-left">
+                <div class="fs-img-container">
+                    <img id="modal-img" src="" alt="Perfume">
+                </div>
+            </div>
+            <div class="fs-right">
+                <div class="fs-info">
+                    <span class="brand-label" id="modal-brand">BRAND</span>
+                    <h2 class="title" id="modal-name">Product Name</h2>
+                    <p class="rating" id="modal-rating">★★★★★</p>
+                    <p class="desc" id="modal-desc">Description</p>
+                    <h3 class="price" id="modal-price">$0</h3>
+                    <div class="fs-actions">
+                        <button class="btn-primary hover-target" id="modal-add">Add to Cart</button>
+                        <button class="btn-secondary hover-target wishlist-toggle-modal" id="modal-wishlist">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-bg fade-in"
+            style="background-image: url('https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1920&q=80');">
+        </div>
+        <div class="hero-content">
+            <div class="reveal-text">
+                <h1>A Fragrance</h1>
+            </div>
+            <div class="reveal-text delay-1">
+                <h1><em>That Defines You</em></h1>
+            </div>
+            <div class="reveal-text delay-2 mt-4">
+                <a href="#collection" class="btn-outline hover-target">Explore Collection</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Magazine Collection Section -->
+    <section class="section collection-sec" id="collection">
+        <div class="container">
+            <div class="section-head reveal-on-scroll">
+                <h2 class="editorial-title">Signature<br><em>Collection</em></h2>
+                <div class="filter-group">
+                    <button class="filter-btn active hover-target" data-filter="all">All</button>
+                    <button class="filter-btn hover-target" data-filter="Dior">Dior</button>
+                    <button class="filter-btn hover-target" data-filter="Chanel">Chanel</button>
+                    <button class="filter-btn hover-target" data-filter="Creed">Creed</button>
+                </div>
+            </div>
+
+            <div class="carousel-container">
+                <button class="carousel-btn left-btn hover-target" id="prev-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                </button>
+                <div class="asym-grid carousel-track" id="product-grid">
+                    <!--  Products injected by JS -->
+                </div>
+                <button class="carousel-btn right-btn hover-target" id="next-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
+            </div>
+            <div id="no-products" class="no-results" style="display: none;">No fragrances matched your selection.</div>
+        </div>
+    </section>
+
+    <!-- Elegant Banner -->
+    <section class="luxury-strip reveal-on-scroll">
+        <div class="strip-content">
+            <p>Enjoy <em>20% Off</em> Your First Order with code <strong>ELITE</strong></p>
+        </div>
+    </section>
+
+    <!-- Brand Story -->
+    <section class="story-sec" id="story">
+        <div class="story-img parallax-img"
+            style="background-image: url('https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=1920&q=80');">
+        </div>
+        <div class="story-content reveal-on-scroll">
+            <h2>Crafted for those <br>who live through<br> <em>elegance and scent</em></h2>
+            <p>Our curation transcends traditional retail. We bring you olfactive masterpieces sourced globally,
+                presenting an artistic journey in every bottle.</p>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="section features-sec">
+        <div class="container features-grid">
+            <div class="feature reveal-on-scroll">
+                <div class="f-num">01</div>
+                <h3>Authentic Masters</h3>
+                <p>Direct from legacy houses.</p>
+            </div>
+            <div class="feature reveal-on-scroll delay-1">
+                <div class="f-num">02</div>
+                <h3>Bespoke Wrapping</h3>
+                <p>Immaculate dusty rose packaging.</p>
+            </div>
+            <div class="feature reveal-on-scroll delay-2">
+                <div class="f-num">03</div>
+                <h3>White Glove</h3>
+                <p>Complimentary overnight delivery.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section testimonials-sec reveal-on-scroll">
+        <div class="container">
+            <h2 class="editorial-title text-center">Refined <em>Voices</em></h2>
+            <div class="test-grid">
+                <div class="test-card">
+                    <p class="quote">"An unboxing experience that feels like a private exhibition. Pure art."</p>
+                    <p class="author">— Eleanor V.</p>
+                </div>
+                <div class="test-card">
+                    <p class="quote">"The only curation I trust for my signature scents. Flawless presentation."</p>
+                    <p class="author">— James M.</p>
+                </div>
+                <div class="test-card">
+                    <p class="quote">"A digital masterpiece that elegantly mirrors the luxury of the fragrances."</p>
+                    <p class="author">— Sofia T.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="reveal-on-scroll text-center">
+            <h2 class="massive-text">Find Your <br><em>Signature.</em></h2>
+            <a href="#collection" class="btn-primary hover-target mt-4">Discover Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="f-left">
+                <a href="#" class="logo">Elite</a>
+                <p class="f-desc">The global destination for artistic perfumery.</p>
+            </div>
+            <div class="f-links">
+                <a href="#" class="hover-target">Journal</a>
+                <a href="#" class="hover-target">Concierge</a>
+                <a href="#" class="hover-target">Boutiques</a>
+                <a href="#" class="hover-target">Terms</a>
+            </div>
+            <div class="f-right">
+                <p>Join the inner circle.</p>
+                <div class="f-mail">
+                    <input type="email" placeholder="email address" class="hover-target">
+                    <button class="hover-target">Subscribe</button>
+                </div>
+            </div>
+        </div>
+        <div class="f-bottom">
+            <p>&copy; 2026 Elite Fragrance. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

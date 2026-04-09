@@ -208,32 +208,59 @@ function renderGrid(searchTerm = "", filterBrand = "all") {
 
     if (filtered.length === 0) {
         noProductsMsg.style.display = 'block';
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
     } else {
         noProductsMsg.style.display = 'none';
-        filtered.forEach((product, index) => {
-            const itemRender = document.createElement('div');
-            itemRender.className = `product-item`;
-            
-            // Add slight delay to staggered animation
-            setTimeout(() => itemRender.classList.add('visible'), index * 150);
+        if (prevBtn) prevBtn.style.display = 'flex';
+        if (nextBtn) nextBtn.style.display = 'flex';
 
-            itemRender.innerHTML = `
-                <div class="p-img-box">
-                    <img src="${product.image}" loading="lazy" alt="${product.name}">
-                    <div class="p-overlay">
-                        <button class="quick-view-trigger hover-target" data-id="${product.id}">Discover</button>
+        // To create a seamless infinite loop, we render the items multiple times
+        // We'll render them 3 times to ensure there's always content to scroll into
+        const renderSet = (items, prefix) => {
+            items.forEach((product, index) => {
+                const itemRender = document.createElement('div');
+                itemRender.className = `product-item`;
+                itemRender.dataset.originalIndex = index;
+                
+                // Only animate the first set for better performance
+                if (prefix === 0) {
+                    setTimeout(() => itemRender.classList.add('visible'), index * 100);
+                } else {
+                    itemRender.classList.add('visible');
+                }
+
+                itemRender.innerHTML = `
+                    <div class="p-img-box">
+                        <img src="${product.image}" loading="lazy" alt="${product.name}">
+                        <div class="p-overlay">
+                            <button class="quick-view-trigger hover-target" data-id="${product.id}">Discover</button>
+                        </div>
                     </div>
-                </div>
-                <div class="p-info">
-                    <div>
-                        <span class="p-brand">${product.brand}</span>
-                        <h3 class="p-title">${product.name}</h3>
-                        <p class="p-desc">${product.description}</p>
+                    <div class="p-info">
+                        <div>
+                            <span class="p-brand">${product.brand}</span>
+                            <h3 class="p-title">${product.name}</h3>
+                            <p class="p-desc">${product.description}</p>
+                        </div>
+                        <div class="p-price">$${product.price}</div>
                     </div>
-                    <div class="p-price">$${product.price}</div>
-                </div>
-            `;
-            productGrid.appendChild(itemRender);
+                `;
+                productGrid.appendChild(itemRender);
+            });
+        };
+
+        // Render 3 sets: [Clone-End] [Actual] [Clone-Start]
+        // But for simplicity and standard infinite loops with snap-back:
+        // Render 3 times [123][123][123] and start at the middle one.
+        renderSet(filtered, 0);
+        renderSet(filtered, 1);
+        renderSet(filtered, 2);
+
+        // After rendering, wait for a tick then position the scroll in the middle set
+        requestAnimationFrame(() => {
+            const setWidth = productGrid.scrollWidth / 3;
+            productGrid.scrollLeft = setWidth;
         });
 
         attachDynamicEvents();
@@ -391,22 +418,49 @@ function executeObservers() {
     revealElements.forEach(el => observer.observe(el));
 }
 
-// Initialize
-renderGrid();
-
 // Carousel Navigation
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 
+// Initialize Grid after buttons are defined
+renderGrid();
+
 if (prevBtn && nextBtn) {
+    const getSetWidth = () => productGrid.scrollWidth / 3;
+
+    // Remove the scroll listener as it conflicts with smooth scrolling
+    // If manual scrolling is needed, we'll keep a very basic check
+    productGrid.addEventListener('scroll', () => {
+        const setWidth = getSetWidth();
+        if (productGrid.scrollLeft >= setWidth * 2.5 || productGrid.scrollLeft <= setWidth * 0.5) {
+            // Only snap if we are far out and NOT during a smooth scroll
+            // This is a fallback for manual scrolling
+        }
+    });
+
     prevBtn.addEventListener('click', () => {
+        const setWidth = getSetWidth();
         const item = productGrid.querySelector('.product-item');
         const scrollAmount = item ? (item.offsetWidth + 20) * 2 : 300;
+        
+        // If moving back would cross into 1st set, teleport forward first
+        if (productGrid.scrollLeft - scrollAmount < setWidth) {
+            productGrid.scrollLeft += setWidth;
+        }
+        
         productGrid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     });
+    
     nextBtn.addEventListener('click', () => {
+        const setWidth = getSetWidth();
         const item = productGrid.querySelector('.product-item');
         const scrollAmount = item ? (item.offsetWidth + 20) * 2 : 300;
+        
+        // If moving forward would cross into 3rd set, teleport back first
+        if (productGrid.scrollLeft + scrollAmount > setWidth * 2) {
+            productGrid.scrollLeft -= setWidth;
+        }
+        
         productGrid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
 }

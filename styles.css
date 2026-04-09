@@ -356,13 +356,13 @@ em {
     display: flex;
     align-items: center;
     width: 100%;
+    padding: 0 60px; /* Added padding to make space for arrows beside products */
 }
 
 .asym-grid, .carousel-track {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
-    scroll-behavior: smooth;
     gap: 20px;
     padding: 10px 0 40px 0; /* Add bottom padding for box-shadow allowance */
     opacity: 1;
@@ -394,8 +394,8 @@ em {
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.left-btn { left: -25px; }
-.right-btn { right: -25px; }
+.left-btn { left: 5px; }
+.right-btn { right: 5px; }
 
 .carousel-btn:hover {
     background: var(--champagne);
@@ -494,7 +494,7 @@ em {
 
 /* Final CTA */
 .final-cta { padding: 10rem 0; }
-.massive-text { font-size: 6rem; line-height: 1; }
+.massive-text { font-size: 6rem; line-height: 1.1; margin-bottom: 3rem; }
 
 /* Footer */
 .footer { background: var(--text-dark); color: var(--bg-ivory); padding: 5rem 0 2rem; }

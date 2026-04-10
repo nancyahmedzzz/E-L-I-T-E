@@ -79,6 +79,15 @@ body {
     font-family: var(--font-body);
     overflow-x: hidden;
     line-height: 1.6;
+    width: 100%;
+}
+
+html {
+    scroll-behavior: smooth;
+    background-color: var(--bg-ivory);
+    transition: background-color 0.5s ease;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 #bg-canvas {
@@ -639,7 +648,7 @@ em {
     /* 3D Carousel Setup */
     .carousel-container.mode-3d {
         perspective: 1500px;
-        overflow: visible;
+        overflow: hidden; /* Prevent 3D items from causing horizontal scroll */
         height: clamp(450px, 85vh, 600px);
         display: flex;
         align-items: center;

@@ -285,22 +285,24 @@ function attachDynamicEvents() {
         });
     });
 
-    // 3D Tilt Effect for cards
-    document.querySelectorAll('.product-item').forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -10; 
-            const rotateY = ((x - centerX) / centerX) * 10;
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    // 3D Tilt Effect for cards - Only for devices with a fine pointer (mouse)
+    if (window.matchMedia("(pointer: fine)").matches) {
+        document.querySelectorAll('.product-item').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10; 
+                const rotateY = ((x - centerX) / centerX) * 10;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
         });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-        });
-    });
+    }
 }
 
 // Quick View Modal
@@ -432,9 +434,11 @@ if (prevBtn && nextBtn) {
     // If manual scrolling is needed, we'll keep a very basic check
     productGrid.addEventListener('scroll', () => {
         const setWidth = getSetWidth();
-        if (productGrid.scrollLeft >= setWidth * 2.5 || productGrid.scrollLeft <= setWidth * 0.5) {
-            // Only snap if we are far out and NOT during a smooth scroll
-            // This is a fallback for manual scrolling
+        // Teleport back to the middle set if we scroll too far in either direction
+        if (productGrid.scrollLeft >= setWidth * 2.1) {
+            productGrid.scrollLeft -= setWidth;
+        } else if (productGrid.scrollLeft <= setWidth * 0.9) {
+            productGrid.scrollLeft += setWidth;
         }
     });
 

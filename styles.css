@@ -578,20 +578,58 @@ em {
 
 
 /* Responsive overrides */
-@media (max-width: 992px) {
-    .asym-grid { display: flex; flex-direction: column; gap: 30px;}
-    .product-item { margin-top: 0 !important; width: 100%;}
-    .p-img-box { aspect-ratio: 1/1 !important;}
+@media (max-width: 1024px) {
+    .editorial-title { font-size: 3rem; }
+    .product-item { flex: 0 0 calc(33.333% - 15px); }
+    .carousel-container { padding: 0 50px; }
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 25px; }
+    .section { padding: 5rem 0; }
     
-    .fs-content { flex-direction: column; overflow-y: auto;}
-    .fs-left { width: 100%; height: 50vh;}
-    .fs-right { width: 100%; padding: 40px 20px;}
-    .fs-right h2 { font-size: 2.5rem;}
+    .editorial-title { font-size: 2.5rem; margin-bottom: 2rem; }
+    .hero h1 { font-size: 2.8rem; }
+    .massive-text { font-size: 3.5rem; }
+
+    /* Carousel Peek Effect */
+    .carousel-container { padding: 0 20px; }
+    .asym-grid, .carousel-track { 
+        gap: 15px; 
+        padding-bottom: 20px;
+    }
+    .product-item { 
+        flex: 0 0 75%; /* Show 1.25 items */
+        min-width: 260px;
+    }
     
-    .hero h1 { font-size: 3rem;}
-    .nav-container { padding: 0 20px;}
-    .nav-left { display: none;}
-    .cart-drawer { width: 100%; right: -100%;}
+    .carousel-btn { display: none; } /* Use swipe on mobile */
     
-    .features-grid, .test-grid, .footer-content { grid-template-columns: 1fr;}
+    .p-img-box { aspect-ratio: 4/5; animation: none; } /* Disable animation to avoid jittery touch */
+    .p-title { font-size: 1.5rem; }
+    .p-overlay { opacity: 1; background: rgba(249, 247, 244, 0.15); backdrop-filter: none; }
+    .quick-view-trigger { transform: translateY(0); width: 60px; height: 60px; font-size: 0.6rem; }
+
+    .story-sec { margin: 4rem 0; }
+    .story-img { height: 50vh; }
+    .story-content { padding: 3rem 1.5rem; margin-top: -50px; width: 90%; }
+    .story-content h2 { font-size: 2rem; }
+
+    .features-grid, .test-grid, .footer-content { 
+        grid-template-columns: 1fr; 
+        gap: 30px;
+    }
+    
+    .fs-content { flex-direction: column; overflow-y: auto; }
+    .fs-left { width: 100%; height: 45vh; }
+    .fs-right { width: 100%; padding: 30px 20px; }
+    .fs-right h2 { font-size: 2.2rem; }
+    .fs-right .desc { font-size: 1rem; margin-bottom: 25px; }
+    .fs-actions { flex-direction: column; }
+    .fs-actions .btn-primary { width: 100%; }
+
+    .nav-container { padding: 0 20px; }
+    .nav-left { display: none; }
+    .logo { font-size: 1.8rem; }
+    .cart-drawer { width: 100%; padding-top: 60px; }
 }

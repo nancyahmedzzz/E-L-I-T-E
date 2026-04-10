@@ -585,17 +585,28 @@ em {
 }
 
 @media (max-width: 768px) {
-    .container { padding: 0 20px; }
-    .section { padding: 4rem 0; }
+    .container { padding: 0 15px; }
+    .section { padding: clamp(3rem, 10vh, 5rem) 0; }
     
-    .editorial-title { font-size: 2.2rem; margin-bottom: 2rem; }
-    .hero h1 { font-size: 2.5rem; }
-    .massive-text { font-size: 3rem; margin-bottom: 2rem; }
+    .editorial-title { 
+        font-size: clamp(1.8rem, 8vw, 2.2rem); 
+        margin-bottom: 2rem; 
+        line-height: 1.1;
+    }
+    .hero h1 { 
+        font-size: clamp(2rem, 10vw, 3rem); 
+        line-height: 1.1;
+    }
+    .massive-text { 
+        font-size: clamp(2.5rem, 15vw, 4rem); 
+        line-height: 1;
+        margin-bottom: 2rem; 
+    }
 
     /* Navbar Fixes */
-    .navbar { padding: 15px 0; }
-    .logo { font-size: 1.6rem; letter-spacing: 1px; }
-    .nav-right { gap: 15px; }
+    .navbar { padding: clamp(10px, 3vh, 15px) 0; }
+    .logo { font-size: clamp(1.4rem, 6vw, 1.8rem); letter-spacing: 1px; }
+    .nav-right { gap: clamp(10px, 4vw, 20px); }
     .nav-container { padding: 0 15px; }
     .cart-text { display: none; } /* Hide 'Cart' text on small screens */
     .badge-dot { margin-left: 4px; }
@@ -614,16 +625,22 @@ em {
     .fs-actions .btn-secondary { width: 100%; order: 2; }
     .close-fs { top: 15px; right: 20px; font-size: 2.5rem; z-index: 100; }
 
-    .story-sec { margin: 3rem 0; }
-    .story-img { height: 50vh; }
-    .story-content { padding: 3rem 1.5rem; margin-top: -50px; width: 90%; }
-    .story-content h2 { font-size: 2rem; }
+    .story-sec { margin: 2rem 0; }
+    .story-img { height: 65vh; min-height: 400px; }
+    .story-content { 
+        padding: clamp(2rem, 10vw, 4rem) 1.5rem; 
+        margin-top: -80px; 
+        width: 95%; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .story-content h2 { font-size: clamp(1.6rem, 7vw, 2.2rem); margin-bottom: 1.5rem; }
+    .story-content p { font-size: 1rem; }
 
     /* 3D Carousel Setup */
     .carousel-container.mode-3d {
         perspective: 1500px;
         overflow: visible;
-        height: 550px;
+        height: clamp(450px, 85vh, 600px);
         display: flex;
         align-items: center;
         width: 100%;
@@ -697,4 +714,23 @@ em {
     .product-item.mode-3d .p-price {
         font-size: 1rem;
     }
+
+    .luxury-strip { 
+        margin: 2rem 0; 
+        padding: 30px 15px; 
+    }
+    .strip-content p { 
+        font-size: clamp(1.1rem, 5vw, 1.4rem); 
+    }
+    .strip-content strong {
+        font-size: 0.9rem;
+    }
+
+    .features-grid, .test-grid, .footer-content { 
+        grid-template-columns: 1fr; 
+        gap: 2rem;
+    }
+    
+    .footer { padding: 4rem 0 2rem; }
+    .footer-content { gap: 3rem; margin-bottom: 3rem; }
 }

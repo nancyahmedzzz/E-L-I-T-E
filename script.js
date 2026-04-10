@@ -88,6 +88,10 @@ let cart = [];
 let wishlist = new Set();
 let activeFilter = 'all';
 
+// Global Elements
+const productGrid = document.getElementById('product-grid');
+const noProductsMsg = document.getElementById('no-products');
+
 // Theme Toggle Logic
 const themeToggle = document.getElementById('theme-toggle');
 const moonIcon = document.getElementById('moon-icon');
@@ -193,10 +197,6 @@ overlay.addEventListener('click', () => {
     overlay.classList.remove('active');
 });
 
-// Render Grid
-const productGrid = document.getElementById('product-grid');
-const noProductsMsg = document.getElementById('no-products');
-
 function renderGrid(searchTerm = "", filterBrand = "all") {
     productGrid.innerHTML = '';
     
@@ -206,30 +206,29 @@ function renderGrid(searchTerm = "", filterBrand = "all") {
         return matchesSearch && matchesBrand;
     });
 
+    const isMobile = window.innerWidth <= 768;
+    const container = document.querySelector('.carousel-container');
+
     if (filtered.length === 0) {
         noProductsMsg.style.display = 'block';
         if (prevBtn) prevBtn.style.display = 'none';
         if (nextBtn) nextBtn.style.display = 'none';
+        productGrid.classList.remove('mode-3d');
+        container.classList.remove('mode-3d');
     } else {
         noProductsMsg.style.display = 'none';
-        if (prevBtn) prevBtn.style.display = 'flex';
-        if (nextBtn) nextBtn.style.display = 'flex';
-
-        // To create a seamless infinite loop, we render the items multiple times
-        // We'll render them 3 times to ensure there's always content to scroll into
-        const renderSet = (items, prefix) => {
-            items.forEach((product, index) => {
+        
+        if (isMobile) {
+            productGrid.classList.add('mode-3d');
+            container.classList.add('mode-3d');
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            
+            // In 3D mode, we only need one set of items
+            filtered.forEach((product, index) => {
                 const itemRender = document.createElement('div');
-                itemRender.className = `product-item`;
-                itemRender.dataset.originalIndex = index;
-                
-                // Only animate the first set for better performance
-                if (prefix === 0) {
-                    setTimeout(() => itemRender.classList.add('visible'), index * 100);
-                } else {
-                    itemRender.classList.add('visible');
-                }
-
+                itemRender.className = `product-item mode-3d`;
+                itemRender.dataset.index = index;
                 itemRender.innerHTML = `
                     <div class="p-img-box">
                         <img src="${product.image}" loading="lazy" alt="${product.name}">
@@ -241,30 +240,148 @@ function renderGrid(searchTerm = "", filterBrand = "all") {
                         <div>
                             <span class="p-brand">${product.brand}</span>
                             <h3 class="p-title">${product.name}</h3>
-                            <p class="p-desc">${product.description}</p>
                         </div>
                         <div class="p-price">$${product.price}</div>
                     </div>
                 `;
                 productGrid.appendChild(itemRender);
+                setTimeout(() => itemRender.classList.add('visible'), index * 100);
             });
-        };
+            
+            init3DCarousel(filtered.length);
+        } else {
+            productGrid.classList.remove('mode-3d');
+            container.classList.remove('mode-3d');
+            if (prevBtn) prevBtn.style.display = 'flex';
+            if (nextBtn) nextBtn.style.display = 'flex';
 
-        // Render 3 sets: [Clone-End] [Actual] [Clone-Start]
-        // But for simplicity and standard infinite loops with snap-back:
-        // Render 3 times [123][123][123] and start at the middle one.
-        renderSet(filtered, 0);
-        renderSet(filtered, 1);
-        renderSet(filtered, 2);
+            const renderSet = (items, prefix) => {
+                items.forEach((product, index) => {
+                    const itemRender = document.createElement('div');
+                    itemRender.className = `product-item`;
+                    itemRender.dataset.originalIndex = index;
+                    if (prefix === 0) setTimeout(() => itemRender.classList.add('visible'), index * 100);
+                    else itemRender.classList.add('visible');
 
-        // After rendering, wait for a tick then position the scroll in the middle set
-        requestAnimationFrame(() => {
-            const setWidth = productGrid.scrollWidth / 3;
-            productGrid.scrollLeft = setWidth;
-        });
+                    itemRender.innerHTML = `
+                        <div class="p-img-box">
+                            <img src="${product.image}" loading="lazy" alt="${product.name}">
+                            <div class="p-overlay">
+                                <button class="quick-view-trigger hover-target" data-id="${product.id}">Discover</button>
+                            </div>
+                        </div>
+                        <div class="p-info">
+                            <div>
+                                <span class="p-brand">${product.brand}</span>
+                                <h3 class="p-title">${product.name}</h3>
+                                <p class="p-desc">${product.description}</p>
+                            </div>
+                            <div class="p-price">$${product.price}</div>
+                        </div>
+                    `;
+                    productGrid.appendChild(itemRender);
+                });
+            };
+
+            renderSet(filtered, 0);
+            renderSet(filtered, 1);
+            renderSet(filtered, 2);
+
+            requestAnimationFrame(() => {
+                const setWidth = productGrid.scrollWidth / 3;
+                productGrid.scrollLeft = setWidth;
+            });
+        }
 
         attachDynamicEvents();
     }
+}
+
+// 3D Carousel Logic
+let carouselState = {
+    angle: 0,
+    items: 0,
+    radius: 0,
+    itemAngle: 0,
+    isDragging: false,
+    startX: 0,
+    currentX: 0,
+    startAngle: 0
+};
+
+function init3DCarousel(numItems) {
+    const itemWidth = 280;
+    carouselState.items = numItems;
+    carouselState.itemAngle = 360 / numItems;
+    carouselState.radius = Math.round((itemWidth / 2) / Math.tan(Math.PI / numItems)) + 50;
+    carouselState.angle = 0;
+    
+    update3DTransforms();
+    setup3DEvents();
+}
+
+function update3DTransforms() {
+    const items = productGrid.querySelectorAll('.product-item.mode-3d');
+    const radius = carouselState.radius;
+    const itemAngle = carouselState.itemAngle;
+    const currentAngle = carouselState.angle;
+
+    // The grid itself rotates
+    productGrid.style.transform = `translateZ(-${radius}px) rotateY(${currentAngle}deg)`;
+
+    items.forEach((item, i) => {
+        const theta = itemAngle * i;
+        item.style.transform = `rotateY(${theta}deg) translateZ(${radius}px)`;
+        
+        // Calculate focus
+        // We want the item that is at the "front" (relative angle near 0) to be active
+        // After track rotation, the item's world angle is (theta + currentAngle)
+        let worldAngle = (theta + currentAngle) % 360;
+        if (worldAngle < 0) worldAngle += 360;
+        
+        // Normalized focus (0 is front)
+        if (worldAngle < 20 || worldAngle > 340) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+function setup3DEvents() {
+    productGrid.onmousedown = handleDragStart;
+    productGrid.ontouchstart = handleDragStart;
+    window.onmousemove = handleDragMove;
+    window.ontouchmove = handleDragMove;
+    window.onmouseup = handleDragEnd;
+    window.ontouchend = handleDragEnd;
+}
+
+function handleDragStart(e) {
+    carouselState.isDragging = true;
+    carouselState.startX = e.pageX || e.touches[0].pageX;
+    carouselState.startAngle = carouselState.angle;
+    productGrid.style.transition = 'none';
+}
+
+function handleDragMove(e) {
+    if (!carouselState.isDragging) return;
+    const x = e.pageX || e.touches[0].pageX;
+    const dx = x - carouselState.startX;
+    const sensitivity = 0.3; // How much mouse move translates to rotation
+    carouselState.angle = carouselState.startAngle + (dx * sensitivity);
+    update3DTransforms();
+}
+
+function handleDragEnd() {
+    if (!carouselState.isDragging) return;
+    carouselState.isDragging = false;
+    productGrid.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+    
+    // Snap to nearest item
+    const snapAngle = Math.round(carouselState.angle / carouselState.itemAngle) * carouselState.itemAngle;
+    carouselState.angle = snapAngle;
+    update3DTransforms();
 }
 
 // Attach Events (Filters & Dynamic Buttons)
